@@ -1,0 +1,94 @@
+TRAIN:
+  ENABLE: False
+  DATASET: ava
+  BATCH_SIZE: 4
+  EVAL_PERIOD: 10
+  CHECKPOINT_PERIOD: 1
+  AUTO_RESUME: True
+  # CHECKPOINT_FILE_PATH: path to the pretrain checkpoint file.
+  CHECKPOINT_TYPE: pytorch
+DATA:
+  NUM_FRAMES: 4
+  SAMPLING_RATE: 16
+  TRAIN_JITTER_SCALES: [256, 320]
+  TRAIN_CROP_SIZE: 224
+  TEST_CROP_SIZE: 256
+  INPUT_CHANNEL_NUM: [3]
+  PATH_TO_DATA_DIR: '/home/ddquan/slowfast/data/ava/vidtest_15mins'
+DETECTION:
+  ENABLE: True
+  ALIGNED: True
+AVA:
+  DETECTION_SCORE_THRESH: 0.9
+  TRAIN_PREDICT_BOX_LISTS: [
+    "ava_train_v2.2.csv",
+    "person_box_67091280_iou90/ava_detection_train_boxes_and_labels_include_negative_v2.2.csv",
+  ]
+  TEST_PREDICT_BOX_LISTS: ["person_box_67091280_iou90/ava_detection_val_boxes_and_labels.csv"]
+RESNET:
+  ZERO_INIT_FINAL_BN: True
+  WIDTH_PER_GROUP: 64
+  NUM_GROUPS: 1
+  DEPTH: 50
+  TRANS_FUNC: bottleneck_transform
+  STRIDE_1X1: False
+  NUM_BLOCK_TEMP_KERNEL: [[3], [4], [6], [3]]
+  SPATIAL_DILATIONS: [[1], [1], [1], [2]]
+  SPATIAL_STRIDES: [[1], [2], [2], [1]]
+NONLOCAL:
+  LOCATION: [[[]], [[]], [[]], [[]]]
+  GROUP: [[1], [1], [1], [1]]
+  INSTANTIATION: softmax
+BN:
+  USE_PRECISE_STATS: False
+  NUM_BATCHES_PRECISE: 200
+SOLVER:
+  BASE_LR: 0.1
+  LR_POLICY: steps_with_relative_lrs
+  STEPS: [0, 10, 15, 20]
+  LRS: [1, 0.1, 0.01, 0.001]
+  MAX_EPOCH: 20
+  MOMENTUM: 0.9
+  WEIGHT_DECAY: 1e-7
+ # WARMUP_EPOCHS: 5
+  WARMUP_START_LR: 0.000125
+  OPTIMIZING_METHOD: sgd
+MODEL:
+  NUM_CLASSES: 80
+  ARCH: slow
+  MODEL_NAME: ResNet
+  LOSS_FUNC: bce
+  DROPOUT_RATE: 0.5
+  HEAD_ACT: sigmoid
+TEST:
+  ENABLE: False
+  DATASET: ava
+  BATCH_SIZE: 1
+  CHECKPOINT_TYPE: pytorch
+  CHECKPOINT_FILE_PATH: '/home/ddquan/slowfast/checkpoints/checkpoint_epoch_00020.pyth'
+VIS_MASK:
+  ENABLE: True  
+DATA_LOADER:
+  NUM_WORKERS: 2
+  PIN_MEMORY: True
+NUM_GPUS: 0
+NUM_SHARDS: 1
+RNG_SEED: 0
+OUTPUT_DIR: .
+
+TENSORBOARD:
+  ENABLE: False
+  LOG_DIR: .
+  CLASS_NAMES_PATH: '/home/ddquan/slowfast/data/ava/frame_lists/goc/ava_classids.json'
+  CONFUSION_MATRIX:
+     ENABLE: True
+
+DEMO:
+  ENABLE: True
+  OUTPUT_FILE:      '/home/ddquan/slowfast/data/ava/vidtest_15mins/1Kan4.mp4'
+  LABEL_FILE_PATH:  '/home/ddquan/slowfast/data/ava/frame_lists/goc/ava_classids.json'
+  INPUT_VIDEO: '/home/ddquan/slowfast/data/ava/frames/1Kan4'  # Path to a video file or image folder
+  PREDS_BOXES: '/home/ddquan/slowfast/detections_latest.csv' # Path to pre-computed bouding boxes in AVA format.
+  GT_BOXES:    '/home/ddquan/slowfast/groundtruth_latest.csv' # Path to ground-truth boxes and labels in AVA format (optional).
+
+    
